@@ -19,6 +19,7 @@ apply plugin: "io.freefair.aspectj.post-compile-weaving"
 allprojects {
 
 	apply plugin: 'java'
+	apply plugin: 'eclipse'
 	
     repositories {
 	    jcenter()
