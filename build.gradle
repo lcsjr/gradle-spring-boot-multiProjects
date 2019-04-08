@@ -1,0 +1,64 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "io.freefair.gradle:aspectj-plugin:3.2.0"
+    classpath "org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE"
+  }
+}
+
+apply plugin: 'application'
+apply plugin: "org.springframework.boot"
+apply plugin: 'io.spring.dependency-management'
+apply plugin: "io.freefair.aspectj.post-compile-weaving"
+  
+
+allprojects {
+
+	apply plugin: 'java'
+	
+    repositories {
+	    jcenter()
+	    mavenLocal()
+		maven { url 'https://repo.spring.io/libs-snapshot'}
+		maven { url "https://plugins.gradle.org/m2/"}
+	}
+}
+
+
+
+dependencies {
+    compile  project(':model')
+
+    // This dependency is found on compile classpath of this component and consumers.
+    implementation 'com.google.guava:guava:27.0.1-jre'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.12'
+
+    implementation 'org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    components {
+        withModule('org.springframework:spring-beans') {
+            allVariants {
+                withDependencyConstraints {
+                    // Need to patch constraints because snakeyaml is an optional dependency
+                    it.findAll { it.name == 'snakeyaml' }.each { it.version { strictly '1.19' } }
+                }
+            }
+        }
+    }
+}
+
+// Define the main class for the application
+mainClassName = 'gradle.spring.boot.project.App'
+
+bootJar {
+    mainClassName = 'gradle.spring.boot.project.App'
+}
